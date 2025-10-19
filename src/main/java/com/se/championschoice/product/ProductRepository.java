@@ -16,4 +16,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     //find products by name (search)
     List<Product> findByNameContainingIgnoreCase(String name);
 
+    void deleteAllByVendorId(Long vendorId);
+
 }

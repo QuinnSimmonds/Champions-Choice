@@ -18,4 +18,7 @@ public interface VendorRepository extends JpaRepository<Vendor, Long> {
 
     //check if email exists
     boolean existsByEmail(String email);
+
+
+
 }

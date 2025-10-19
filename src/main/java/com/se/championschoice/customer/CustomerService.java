@@ -1,5 +1,6 @@
 package com.se.championschoice.customer;
 
+import com.se.championschoice.cart.CartRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -8,6 +9,9 @@ public class CustomerService {
 
     @Autowired
     private CustomerRepository customerRepository;
+
+    @Autowired
+    private CartRepository cartRepository;
 
     //Registration
     public Customer register(Customer customer) {
@@ -43,6 +47,23 @@ public class CustomerService {
     public Customer getById(Long id) {
         return customerRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Customer not found"));
+    }
+
+    //Delete Customer by ID
+    public void deleteCustomer(Long id) {
+        //check if customer exists
+        if (!customerRepository.existsById(id)) {
+            throw new RuntimeException("Customer Not Found");
+        }
+
+        //delete all cart items
+        cartRepository.deleteByCustomerId(id);
+
+        //delete the customer
+        customerRepository.deleteById(id);
+
+
+
     }
 
 }

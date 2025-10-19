@@ -2,12 +2,16 @@ package com.se.championschoice.vendor;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.se.championschoice.product.ProductRepository;
 
 @Service
 public class VendorService {
 
     @Autowired
     private VendorRepository vendorRepository;
+
+    @Autowired
+    private ProductRepository productRepository;
 
     //Registration
     public Vendor register(Vendor vendor) {
@@ -42,6 +46,20 @@ public class VendorService {
     //Get Vendor by ID
     public Vendor getById(Long id) {
         return vendorRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Vendor not found"));
+                .orElseThrow(() -> new RuntimeException("Vendor Not Found"));
+    }
+
+    //Delete Vendor by ID
+    public void deleteVendor(Long id) {
+        //check if vendor exists
+        if (!vendorRepository.existsById(id)) {
+            throw new RuntimeException("Vendor Not Found");
+        }
+
+        //delete all products
+        productRepository.deleteAllByVendorId(id);
+
+        //delete the vendor
+        vendorRepository.deleteById(id);
     }
 }
