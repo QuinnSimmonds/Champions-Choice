@@ -1,14 +1,66 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   MDBContainer,
   MDBInput,
-  MDBBtn,
-  MDBIcon
+  MDBBtn
 } from 'mdb-react-ui-kit';
 import logo from '../assets/logo.png';
 
 export default function VendorRegister() {
+  const navigate = useNavigate();
+
+  // form state
+  const [formData, setFormData] = useState({
+    brand: '',
+    username: '',
+    email: '',
+    password: '',
+    confirmPassword: ''
+  });
+
+  const [error, setError] = useState('');
+
+  // handle input change
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value });
+  };
+
+  // handle form submit
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/vendor/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          brand: formData.brand,
+          username: formData.username,
+          email: formData.email,
+          password: formData.password
+        })
+      });
+
+      if (response.ok) {
+        alert('Vendor registered successfully!');
+        navigate('/vendor-login');
+      } else {
+        const errData = await response.json();
+        setError(errData.message || 'Vendor registration failed');
+      }
+    } catch (err) {
+      console.error('Error registering vendor:', err);
+      setError('Server connection error');
+    }
+  };
+
   return (
     <div
       style={{
@@ -33,38 +85,57 @@ export default function VendorRegister() {
           Vendor Registration
         </h3>
 
-        {/* Register Form */}
-        <MDBInput
-          wrapperClass="mb-3"
-          label="Brand"
-          id="vendorBrand"
-          type="brand"
-        />
-        <MDBInput
-          wrapperClass="mb-3"
-          label="Email address"
-          id="vendorEmail"
-          type="email"
-        />
-        <MDBInput
-          wrapperClass="mb-3"
-          label="Password"
-          id="vendorPassword"
-          type="password"
-        />
-        <MDBInput
-          wrapperClass="mb-3"
-          label="Confirm Password"
-          id="vendorConfirmedPassword"
-          type="confirmedpassword"
-        />
+        {/* Registration Form */}
+        <form style={{ width: '100%' }} onSubmit={handleSubmit}>
+          <MDBInput
+            wrapperClass="mb-3"
+            label="Brand"
+            id="brand"
+            type="text"
+            value={formData.brand}
+            onChange={handleChange}
+          />
+          <MDBInput
+            wrapperClass="mb-3"
+            label="Username"
+            id="username"
+            type="text"
+            value={formData.username}
+            onChange={handleChange}
+          />
+          <MDBInput
+            wrapperClass="mb-3"
+            label="Email address"
+            id="email"
+            type="email"
+            value={formData.email}
+            onChange={handleChange}
+          />
+          <MDBInput
+            wrapperClass="mb-3"
+            label="Password"
+            id="password"
+            type="password"
+            value={formData.password}
+            onChange={handleChange}
+          />
+          <MDBInput
+            wrapperClass="mb-3"
+            label="Confirm Password"
+            id="confirmPassword"
+            type="password"
+            value={formData.confirmPassword}
+            onChange={handleChange}
+          />
 
-        <Link to="/vendor-login">        
-            <MDBBtn className="mb-4 w-100" color="primary">Register</MDBBtn>
-        </Link>
+          {error && (
+            <p style={{ color: 'red', textAlign: 'center' }}>{error}</p>
+          )}
 
-        <div className="text-center">
-        </div>
+          <MDBBtn type="submit" className="mb-4 w-100" color="primary">
+            Register
+          </MDBBtn>
+        </form>
       </MDBContainer>
     </div>
   );

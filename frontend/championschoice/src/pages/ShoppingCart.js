@@ -1,93 +1,109 @@
-import React from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
-  MDBBtn,
+  MDBContainer,
   MDBCard,
   MDBCardBody,
-  MDBCardImage,
-  MDBCol,
-  MDBContainer,
-  MDBIcon,
-  MDBInput,
-  MDBRow,
   MDBTypography,
+  MDBBtn,
+  MDBIcon,
+  MDBRow,
+  MDBCol
 } from "mdb-react-ui-kit";
 
 export default function ShoppingCart() {
+  const [cart, setCart] = useState([]);
+  const customer = JSON.parse(localStorage.getItem("customer"));
+
+  // Fetch cart items
+  const fetchCart = useCallback(async () => {
+    if (!customer) return;
+    try {
+      const res = await fetch(`/api/cart/${customer.id}`);
+      const data = await res.json();
+      setCart(data);
+    } catch (err) {
+      console.error("Error loading cart:", err);
+    }
+  }, [customer]);
+
+  useEffect(() => {
+    fetchCart();
+  }, [fetchCart]);
+
+  // Update item quantity
+  const updateQuantity = async (itemId, quantity) => {
+    await fetch(`/api/cart/${itemId}?quantity=${quantity}&customerId=${customer.id}`, {
+      method: "PUT"
+    });
+    fetchCart();
+  };
+
+  // Remove item
+  const removeItem = async (itemId) => {
+    await fetch(`/api/cart/${itemId}?customerId=${customer.id}`, { method: "DELETE" });
+    fetchCart();
+  };
+
+  // Clear entire cart
+  const clearCart = async () => {
+    await fetch(`/api/cart/clear/${customer.id}`, { method: "DELETE" });
+    fetchCart();
+  };
+
+  // Calculate total
+  const total = cart.reduce(
+    (sum, item) => sum + (item.product?.price || 0) * (item.quantity || 1),
+    0
+  );
+
   return (
-    <section className="h-100" style={{ backgroundColor: "#eee" }}>
-      <MDBContainer className="py-5 h-100">
-        <MDBRow className="justify-content-center align-items-center h-100">
-          <MDBCol md="10">
-            {/* Header */}
-            <div className="d-flex justify-content-between align-items-center mb-4">
-              <MDBTypography tag="h3" className="fw-normal mb-0 text-black">
-                Shopping Cart
-              </MDBTypography>
-            </div>
+    <MDBContainer className="py-5">
+      <MDBTypography tag="h2" className="fw-bold mb-4 text-primary">
+        Shopping Cart
+      </MDBTypography>
 
-            {/* Product Cards (repeated static layout for now) */}
-            {[1, 2, 3].map((item) => (
-              <MDBCard className="rounded-3 mb-4" key={item}>
-                <MDBCardBody className="p-4">
-                  <MDBRow className="justify-content-between align-items-center">
-                    <MDBCol md="2" lg="2" xl="2">
-                      <MDBCardImage
-                        className="rounded-3"
-                        fluid
-                        src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-shopping-carts/img1.webp"
-                        alt="Cotton T-shirt"
-                      />
-                    </MDBCol>
-                    <MDBCol md="3" lg="3" xl="3">
-                      <p className="lead fw-normal mb-2">Basic T-shirt</p>
-                      <p>
-                        <span className="text-muted">Size: </span>M{" "}
-                        <span className="text-muted">Color: </span>Grey
-                      </p>
-                    </MDBCol>
-                    <MDBCol
-                      md="3"
-                      lg="3"
-                      xl="2"
-                      className="d-flex align-items-center justify-content-around"
-                    >
-                      <MDBBtn color="link" className="px-2">
-                        <MDBIcon fas icon="minus" />
-                      </MDBBtn>
+      {cart.length === 0 ? (
+        <p className="text-muted">Your cart is empty.</p>
+      ) : (
+        cart.map((item) => (
+          <MDBCard className="mb-3" key={item.id}>
+            <MDBCardBody>
+              <MDBRow className="align-items-center">
+                <MDBCol md="6">
+                  <p className="fw-bold">{item.product?.name}</p>
+                  <p className="text-muted">{item.product?.description}</p>
+                </MDBCol>
+                <MDBCol md="2">
+                  <p>${item.product?.price}</p>
+                </MDBCol>
+                <MDBCol md="2">
+                  <input
+                    type="number"
+                    min="1"
+                    value={item.quantity}
+                    onChange={(e) => updateQuantity(item.id, e.target.value)}
+                    style={{ width: "60px", textAlign: "center" }}
+                  />
+                </MDBCol>
+                <MDBCol md="2" className="text-end">
+                  <MDBBtn color="danger" outline onClick={() => removeItem(item.id)}>
+                    <MDBIcon fas icon="trash" />
+                  </MDBBtn>
+                </MDBCol>
+              </MDBRow>
+            </MDBCardBody>
+          </MDBCard>
+        ))
+      )}
 
-                      <MDBInput min={0} defaultValue={2} type="number" size="sm" />
-
-                      <MDBBtn color="link" className="px-2">
-                        <MDBIcon fas icon="plus" />
-                      </MDBBtn>
-                    </MDBCol>
-                    <MDBCol md="3" lg="2" xl="2" className="offset-lg-1">
-                      <MDBTypography tag="h5" className="mb-0">
-                        $499.00
-                      </MDBTypography>
-                    </MDBCol>
-                    <MDBCol md="1" lg="1" xl="1" className="text-end">
-                      <a href="#!" className="text-danger">
-                        <MDBIcon fas icon="trash text-danger" size="lg" />
-                      </a>
-                    </MDBCol>
-                  </MDBRow>
-                </MDBCardBody>
-              </MDBCard>
-            ))}
-
-            {/* Checkout button */}
-            <MDBCard>
-              <MDBCardBody>
-                <MDBBtn color="warning" block size="lg">
-                  Checkout
-                </MDBBtn>
-              </MDBCardBody>
-            </MDBCard>
-          </MDBCol>
-        </MDBRow>
-      </MDBContainer>
-    </section>
+      {cart.length > 0 && (
+        <div className="d-flex justify-content-between align-items-center mt-4">
+          <MDBTypography tag="h4">Total: ${total}</MDBTypography>
+          <MDBBtn color="danger" onClick={clearCart}>
+            Clear Cart
+          </MDBBtn>
+        </div>
+      )}
+    </MDBContainer>
   );
 }
-

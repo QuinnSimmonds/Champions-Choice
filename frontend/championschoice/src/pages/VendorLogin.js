@@ -1,14 +1,60 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import {
   MDBContainer,
   MDBInput,
-  MDBBtn,
-  MDBIcon
+  MDBBtn
 } from 'mdb-react-ui-kit';
 import logo from '../assets/logo.png';
 
 export default function VendorLogin() {
+  const navigate = useNavigate();
+
+  // State for form inputs and error
+  const [formData, setFormData] = useState({
+    username: '',
+    password: ''
+  });
+  const [error, setError] = useState('');
+
+  // Handle input change
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value });
+  };
+
+  // Handle form submission
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+
+    try {
+      const response = await fetch('/api/vendor/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: formData.username,
+          password: formData.password
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Vendor login successful:', data);
+
+        // Optionally save vendor info in localStorage
+        localStorage.setItem('vendor', JSON.stringify(data));
+
+        navigate('/inventory-manager'); // redirect on success
+      } else {
+        const errData = await response.json();
+        setError(errData.message || 'Invalid username or password');
+      }
+    } catch (err) {
+      console.error('Error logging in:', err);
+      setError('Server connection error');
+    }
+  };
+
   return (
     <div
       style={{
@@ -34,29 +80,43 @@ export default function VendorLogin() {
         </h3>
 
         {/* Login Form */}
-        <MDBInput
-          wrapperClass="mb-3"
-          label="Email address"
-          id="vendorEmail"
-          type="email"
-        />
-        <MDBInput
-          wrapperClass="mb-3"
-          label="Password"
-          id="vendorPassword"
-          type="password"
-        />
+        <form style={{ width: '100%' }} onSubmit={handleSubmit}>
+          <MDBInput
+            wrapperClass="mb-3"
+            label="Username"
+            id="username"
+            type="text"
+            value={formData.username}
+            onChange={handleChange}
+          />
+          <MDBInput
+            wrapperClass="mb-3"
+            label="Password"
+            id="password"
+            type="password"
+            value={formData.password}
+            onChange={handleChange}
+          />
 
-        <div className="d-flex justify-content-between mx-2 mb-4 w-100">
-          <a href="#!">Forgot password?</a>
-        </div>
+          {error && (
+            <p style={{ color: 'red', textAlign: 'center' }}>{error}</p>
+          )}
 
-        <Link to="/inventory-manager"> 
-            <MDBBtn className="mb-4 w-100" color="primary">Sign in</MDBBtn>
-        </Link>
+          <div className="d-flex justify-content-between mx-2 mb-4 w-100">
+            <a href="#!">Forgot password?</a>
+          </div>
 
-        <div className="text-center">
-        </div>
+          <MDBBtn type="submit" className="mb-4 w-100" color="primary">
+            Sign in
+          </MDBBtn>
+
+          <div className="text-center">
+            <p>
+              Don’t have an account?{' '}
+              <Link to="/vendor-register">Register here</Link>
+            </p>
+          </div>
+        </form>
       </MDBContainer>
     </div>
   );
