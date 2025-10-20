@@ -70,24 +70,6 @@ export default function CustomerRegister() {
         </Link>
 
         <div className="text-center">
-
-          <div
-            className="d-flex justify-content-between mx-auto"
-            style={{ width: '50%' }}
-          >
-            <MDBBtn tag="a" color="none" className="m-1" style={{ color: '#1266f1' }}>
-              <MDBIcon fab icon="facebook-f" size="sm" />
-            </MDBBtn>
-            <MDBBtn tag="a" color="none" className="m-1" style={{ color: '#1266f1' }}>
-              <MDBIcon fab icon="twitter" size="sm" />
-            </MDBBtn>
-            <MDBBtn tag="a" color="none" className="m-1" style={{ color: '#1266f1' }}>
-              <MDBIcon fab icon="google" size="sm" />
-            </MDBBtn>
-            <MDBBtn tag="a" color="none" className="m-1" style={{ color: '#1266f1' }}>
-              <MDBIcon fab icon="github" size="sm" />
-            </MDBBtn>
-          </div>
         </div>
       </MDBContainer>
     </div>
