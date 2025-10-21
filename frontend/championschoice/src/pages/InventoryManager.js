@@ -20,7 +20,7 @@ export default function InventoryManager() {
     description: "",
     price: "",
     sport: "",
-    image: ""
+    imageUrl: ""
   });
 
   const vendor = JSON.parse(localStorage.getItem("vendor"));
@@ -54,7 +54,7 @@ export default function InventoryManager() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newProduct)
       });
-      setNewProduct({ name: "", description: "", price: "", sport: "", image: "" });
+      setNewProduct({ name: "", description: "", price: "", sport: "", imageUrl: "" });
       fetchProducts();
     } catch (err) {
       console.error("Error adding product:", err);
@@ -102,7 +102,7 @@ export default function InventoryManager() {
             </MDBCol>
           </MDBRow>
 
-          <MDBInput label="Image URL" name="image" value={newProduct.image} onChange={handleChange} />
+          <MDBInput label="Image URL" name="imageUrl" value={newProduct.imageUrl} onChange={handleChange} />
 
           <div className="text-end mt-3">
             <MDBBtn color="success" onClick={addProduct}>
@@ -118,7 +118,13 @@ export default function InventoryManager() {
           <MDBCardBody>
             <MDBRow className="align-items-center">
               <MDBCol md="2">
-                <MDBCardImage src={product.image} alt={product.name} fluid />
+                <MDBCardImage
+                  className="rounded-3"
+                  fluid
+                  src={product.imageUrl}
+                  alt={product.name}
+                  onError={(e) => { e.target.src = '/fallback.png'; }} // fallback just in case
+                />
               </MDBCol>
               <MDBCol md="6">
                 <p className="fw-bold mb-1">{product.name}</p>
