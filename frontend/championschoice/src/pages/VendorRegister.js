@@ -12,7 +12,7 @@ export default function VendorRegister() {
 
   // form state
   const [formData, setFormData] = useState({
-    brand: '',
+    businessName: '',
     username: '',
     email: '',
     password: '',
@@ -41,7 +41,7 @@ export default function VendorRegister() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          brand: formData.brand,
+          businessName: formData.businessName,
           username: formData.username,
           email: formData.email,
           password: formData.password
@@ -89,10 +89,10 @@ export default function VendorRegister() {
         <form style={{ width: '100%' }} onSubmit={handleSubmit}>
           <MDBInput
             wrapperClass="mb-3"
-            label="Brand"
-            id="brand"
+            label="Business Name"
+            id="businessName"
             type="text"
-            value={formData.brand}
+            value={formData.businessName}
             onChange={handleChange}
           />
           <MDBInput
