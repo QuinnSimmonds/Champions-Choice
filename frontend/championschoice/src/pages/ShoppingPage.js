@@ -111,7 +111,7 @@ export default function ShoppingPage() {
             {products.map((product) => (
               <MDBCol md="6" lg="4" xl="3" className="mb-4" key={product.id}>
                 <MDBCard className="h-100 shadow-3">
-                  <MDBCardImage src={product.image} alt={product.name} style={{ height: "220px", objectFit: "cover" }} />
+                  <MDBCardImage src={product.imageUrl} alt={product.name} style={{ height: "220px", objectFit: "cover" }} />
                   <MDBCardBody className="text-center">
                     <MDBTypography tag="h5" className="fw-bold mb-2">
                       {product.name}

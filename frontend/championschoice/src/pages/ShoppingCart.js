@@ -50,6 +50,12 @@ export default function ShoppingCart() {
     fetchCart();
   };
 
+  // Checkout button (placeholder)
+  const handleCheckout = () => {
+    console.log("Checkout clicked!");
+    // Future: redirect to checkout page or handle order submission
+  };
+
   // Calculate total
   const total = cart.reduce(
     (sum, item) => sum + (item.product?.price || 0) * (item.quantity || 1),
@@ -99,9 +105,16 @@ export default function ShoppingCart() {
       {cart.length > 0 && (
         <div className="d-flex justify-content-between align-items-center mt-4">
           <MDBTypography tag="h4">Total: ${total}</MDBTypography>
-          <MDBBtn color="danger" onClick={clearCart}>
-            Clear Cart
-          </MDBBtn>
+
+          <div className="d-flex gap-2">
+            <MDBBtn color="danger" onClick={clearCart}>
+              Clear Cart
+            </MDBBtn>
+
+            <MDBBtn color="success" onClick={handleCheckout}>
+              Checkout
+            </MDBBtn>
+          </div>
         </div>
       )}
     </MDBContainer>
