@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { MDBContainer, MDBBtn, MDBRow, MDBCol, MDBCard, MDBCardBody, MDBNavbar, MDBNavbarBrand, MDBIcon } from 'mdb-react-ui-kit';
+import { MDBContainer, MDBBtn, MDBRow, MDBCol, MDBCard, MDBCardBody, MDBNavbar, MDBNavbarBrand } from 'mdb-react-ui-kit';
 import logo from '../assets/logo.png';
 
 export default function AuthPage() {
