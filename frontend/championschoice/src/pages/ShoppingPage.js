@@ -95,9 +95,17 @@ export default function ShoppingPage() {
             </MDBInputGroup>
           </div>
 
-          <div>
-            <Link to="/shopping-cart" className="text-reset">
-              <MDBIcon fas icon="shopping-cart" size="lg" />
+          <div style={{ textAlign: 'center' }}>
+            <Link to="/shopping-cart" className="text-reset" style={{ textDecoration: 'none' }}>
+              <MDBIcon
+                  fas
+                  icon="shopping-cart"
+                  size="2x"
+                  style={{ color: '#0d47a1' }}
+              />
+              <div style={{ fontSize: '16px', color: '#0d47a1', marginTop: '5px', fontWeight: 'bold' }}>
+                Cart
+              </div>
             </Link>
           </div>
         </MDBContainer>
