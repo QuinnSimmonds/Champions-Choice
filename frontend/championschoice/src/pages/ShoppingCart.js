@@ -63,7 +63,7 @@ export default function ShoppingCart() {
   const total = cart.reduce(
     (sum, item) => sum + (item.product?.price || 0) * (item.quantity || 1),
     0
-  );
+  ).toFixed(2);
 
   return (
     <>

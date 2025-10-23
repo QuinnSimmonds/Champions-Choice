@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Link } from "react-router-dom";
-import { MDBNavbar, MDBNavbarBrand, MDBIcon } from "mdb-react-ui-kit";
+import { MDBNavbar, MDBNavbarBrand } from "mdb-react-ui-kit";
 import {
   MDBContainer,
   MDBInput,
@@ -28,10 +28,22 @@ export default function VendorRegister() {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
 
+  // password validation helper
+  const isValidPassword = (password) => {
+    // must have at least 8 chars, one uppercase, one lowercase, and one number
+    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/;
+    return regex.test(password);
+  };
+
   // handle form submit
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+
+    if (!isValidPassword(formData.password)) {
+      setError('Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, and one number.');
+      return;
+    }
 
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match');
