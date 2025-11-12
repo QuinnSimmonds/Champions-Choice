@@ -3,9 +3,13 @@ package com.se.championschoice.vendor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.se.championschoice.product.ProductRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Service
 public class VendorService {
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
     private VendorRepository vendorRepository;
@@ -25,6 +29,10 @@ public class VendorService {
             throw new RuntimeException("Email Already Registered");
         }
 
+	//encode password before saving to database
+	String hashedPassword = passwordEncoder.encode(vendor.getPassword());
+	vendor.setPassword(hashedPassword);
+
         //Save and return
         return vendorRepository.save(vendor);
     }
@@ -35,8 +43,8 @@ public class VendorService {
         Vendor vendor = vendorRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Vendor Username Not Found"));
 
-        //check password
-        if (!vendor.getPassword().equals(password)) {
+        //check password based on encoding
+        if (!passwordEncoder.matches(password, vendor.getPassword())) {
             throw new RuntimeException("Incorrect Password");
         }
 

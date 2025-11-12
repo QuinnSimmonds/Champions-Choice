@@ -3,9 +3,14 @@ package com.se.championschoice.customer;
 import com.se.championschoice.cart.CartRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 
 @Service
 public class CustomerService {
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
     private CustomerRepository customerRepository;
@@ -25,6 +30,10 @@ public class CustomerService {
             throw new RuntimeException("Email Already Exists");
         }
 
+	//encode password before saving to database
+	String hashedPassword = passwordEncoder.encode(customer.getPassword());
+	customer.setPassword(hashedPassword);
+
         //Save and return
         return customerRepository.save(customer);
     }
@@ -35,8 +44,8 @@ public class CustomerService {
         Customer customer = customerRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Customer Username Not Found"));
 
-        //check password
-        if (!customer.getPassword().equals(password)) {
+        //check password based on encoding
+        if (!passwordEncoder.matches(password, customer.getPassword())) {
             throw new RuntimeException("Incorrect Password");
         }
 

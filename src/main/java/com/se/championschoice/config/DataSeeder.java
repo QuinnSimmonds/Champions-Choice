@@ -4,6 +4,7 @@ import com.github.javafaker.Faker;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.*;
+import java.util.*;
 
 /**
  * generates a standalone CSV file of synthetic sports e-commerce data
@@ -30,6 +31,25 @@ public class DataSeeder {
     // csv generator
     public static void generateCsv(int recordCount) throws IOException {
         Faker faker = new Faker();
+	    Random random = new Random();
+
+        // customer name repetition and address match
+        int uniqueCust = 1000;
+        List<String> customerNames = new ArrayList<>();
+	Map<String, String> customerLocations = new HashMap<>();
+
+        for (int i = 0; i < uniqueCust; i++) {
+            String name = escape(faker.name().fullName());
+            customerNames.add(name);
+
+            String city = escape(faker.address().city());
+	    String state = escape(faker.address().stateAbbr());
+	    customerLocations.put(name, city + ", " + state);
+        }
+
+	
+	
+
 
         // check folder exists
         Path folder = Paths.get(OUTPUT_PATH).getParent();
@@ -39,7 +59,7 @@ public class DataSeeder {
             writer.write("customer_name,age,location,sport,brand,product,quantity,price\n");
 
             for (int i = 0; i < recordCount; i++) {
-		// product generation
+		        // product generation
                 String sport = DataSeederHelper.randomSport();
                 String brand = DataSeederHelper.randomBrandForSport(sport);
                 String type  = DataSeederHelper.randomProductTypeForSport(sport);
@@ -48,11 +68,11 @@ public class DataSeeder {
                 int quantity   = faker.number().numberBetween(1, 5);
 
                 // customer demographics 
-                String customer = faker.name().fullName();
+                String customer = customerNames.get(random.nextInt(customerNames.size()));
                 int age = faker.number().numberBetween(18, 90);
                 String city = faker.address().city();
                 String state = faker.address().stateAbbr();
-                String location = city.replace(",", "") + ", " + state;
+                String location = customerLocations.get(customer);
 
                 // csv line
                 String line = String.join(",",
