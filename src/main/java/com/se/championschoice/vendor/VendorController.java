@@ -25,6 +25,17 @@ public class VendorController {
         return vendorService.login(request.getUsername(), request.getPassword());
     }
 
+    //Apply
+    @PostMapping("/apply")
+    public Map<String, Object> applyForVendor() {
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("approved", true);
+        response.put("vendorCode", vendorService.REQ_VENDOR_CODE);
+
+        return response;
+    }
+
     //Get Profile
     @GetMapping("/{id}")
     public Vendor getProfile(@PathVariable Long id) {

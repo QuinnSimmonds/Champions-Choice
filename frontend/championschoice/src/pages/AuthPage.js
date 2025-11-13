@@ -73,12 +73,16 @@ export default function AuthPage() {
                                     <h4 className="mb-4" style={{ color: '#0d47a1', fontWeight: '600' }}>Vendor Portal</h4>
                                     <p style={{ marginBottom: '30px', color: '#455a64' }}>
                                         Log in or register as a vendor to showcase and manage your products.
+                                        NOTE: you must apply first before registration!
                                     </p>
                                     <Link to="/vendor-login">
                                         <MDBBtn color="success" className="m-2 w-75">Login</MDBBtn>
                                     </Link>
                                     <Link to="/vendor-register">
                                         <MDBBtn outline color="success" className="m-2 w-75">Register</MDBBtn>
+                                    </Link>
+                                    <Link to="/vendor-app">
+                                        <MDBBtn outline color="success" className="m-2 w-75">Apply</MDBBtn>
                                     </Link>
                                 </MDBCardBody>
                             </MDBCard>

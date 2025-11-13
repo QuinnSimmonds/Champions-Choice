@@ -25,7 +25,7 @@ public class VendorService {
     private ProductRepository productRepository;
 
     //Vendor Code
-    private static final String REQ_VENDOR_CODE = "CCVENDOR2025";
+    public final String REQ_VENDOR_CODE = "CCVENDOR2025";
 
     //Registration
     public Vendor register(Vendor vendor) {

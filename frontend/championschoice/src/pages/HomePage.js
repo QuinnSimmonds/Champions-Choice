@@ -234,10 +234,10 @@ export default function HomePage() {
                     <p className="lead mb-4" style={{ color: "#1565c0" }}>
                         Join our platform and reach thousands of customers
                     </p>
-                    <Link to="/vendor-register">
+                    <Link to="/vendor-app">
                         <MDBBtn color="success" size="lg">
                             <MDBIcon fas icon="store" className="me-2" />
-                            Vendor Portal
+                            Apply Now!
                         </MDBBtn>
                     </Link>
                 </MDBContainer>

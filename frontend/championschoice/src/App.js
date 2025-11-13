@@ -15,6 +15,7 @@ import CustomerProfile from "./pages/CustomerProfile";
 import VendorProfile from "./pages/VendorProfile";
 import CheckoutPage from "./pages/CheckoutPage";
 import OrdersPage from "./pages/OrdersPage";
+import VendorApplication from "./pages/VendorApplication";
 
 
 function App() {
@@ -45,6 +46,7 @@ function App() {
 
             {/* Auth portal page - Choose Customer or Vendor */}
             <Route path="/auth" element={<AuthPage />} />
+            <Route path="/vendor-app" element={<VendorApplication />} />
 
             {/* Public shopping page */}
             <Route path="/shopping-page" element={<ShoppingPage />} />
