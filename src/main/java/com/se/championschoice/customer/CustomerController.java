@@ -1,5 +1,6 @@
 package com.se.championschoice.customer;
 
+import com.se.championschoice.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
@@ -20,8 +21,8 @@ public class CustomerController {
 
     //Login
     @PostMapping("/login")
-    public Customer login(@RequestBody Customer loginRequest) {
-        return customerService.login(loginRequest.getUsername(), loginRequest.getPassword());
+    public LoginResponse login(@RequestBody LoginRequest request) {
+        return customerService.login(request.getUsername(), request.getPassword());
     }
 
     //Get Profile

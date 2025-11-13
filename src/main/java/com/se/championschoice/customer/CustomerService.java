@@ -1,6 +1,8 @@
 package com.se.championschoice.customer;
 
 import com.se.championschoice.cart.CartRepository;
+import com.se.championschoice.security.JwtUtil;
+import com.se.championschoice.dto.LoginResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -8,6 +10,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Service
 public class CustomerService {
+    
+    @Autowired
+    private JwtUtil jwtUtil;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -34,12 +39,12 @@ public class CustomerService {
 	String hashedPassword = passwordEncoder.encode(customer.getPassword());
 	customer.setPassword(hashedPassword);
 
-        //Save and return
+        //save and return
         return customerRepository.save(customer);
     }
 
     //Login
-    public Customer login(String username, String password) {
+    public LoginResponse login(String username, String password) {
         //find customer by username
         Customer customer = customerRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Customer Username Not Found"));
@@ -49,7 +54,21 @@ public class CustomerService {
             throw new RuntimeException("Incorrect Password");
         }
 
-        return customer;
+        // generate JWT
+        String token = jwtUtil.generateToken(
+                customer.getId(),
+                customer.getEmail(),
+                "CUSTOMER"
+        );
+
+        return new LoginResponse(
+                customer.getId(),
+                customer.getUsername(),
+                customer.getEmail(),
+                "CUSTOMER",
+                token
+        );
+	
     }
 
     //Get Customer by ID

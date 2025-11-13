@@ -1,12 +1,17 @@
 package com.se.championschoice.vendor;
 
+import com.se.championschoice.product.ProductRepository;
+import com.se.championschoice.security.JwtUtil;
+import com.se.championschoice.dto.LoginResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.se.championschoice.product.ProductRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Service
 public class VendorService {
+
+    @Autowired
+    private JwtUtil jwtUtil;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -38,7 +43,7 @@ public class VendorService {
     }
 
     //Login
-    public Vendor login(String username, String password) {
+    public LoginResponse login(String username, String password) {
         //find vendor by username
         Vendor vendor = vendorRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Vendor Username Not Found"));
@@ -48,7 +53,20 @@ public class VendorService {
             throw new RuntimeException("Incorrect Password");
         }
 
-        return vendor;
+        /// generate JWT
+        String token = jwtUtil.generateToken(
+                vendor.getId(),
+                vendor.getEmail(),
+                "VENDOR"
+        );
+
+        return new LoginResponse(
+                vendor.getId(),
+                vendor.getUsername(),
+                vendor.getEmail(),
+                "VENDOR",
+                token
+        );
     }
 
     //Get Vendor by ID

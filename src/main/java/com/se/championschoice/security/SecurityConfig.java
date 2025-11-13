@@ -1,4 +1,4 @@
-package com.se.championschoice.config;
+package com.se.championschoice.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
