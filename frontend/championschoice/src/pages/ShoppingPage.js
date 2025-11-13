@@ -20,7 +20,14 @@ export default function ShoppingPage() {
   const [products, setProducts] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
-  const customer = JSON.parse(localStorage.getItem("customer"));
+
+  // jwt persistence
+  const token = localStorage.getItem("token");
+  const role = localStorage.getItem("role");
+  const userId = localStorage.getItem("userId");
+
+  const isLoggedIn = !!token;
+  const isCustomer = role === "CUSTOMER";
 
   useEffect(() => {
     fetchProducts();
@@ -43,13 +50,13 @@ export default function ShoppingPage() {
   };
 
   const handleAddToCart = async (productId) => {
-    if (!customer) {
+    if (!isCustomer || !userId) {
       alert("Please log in first!");
       return;
     }
     try {
       const res = await fetch(
-        `/api/cart/add?customerId=${customer.id}&productId=${productId}&quantity=1`,
+        `/api/cart/add?customerId=${userId}&productId=${productId}&quantity=1`,
         { method: "POST" }
       );
       if (res.ok) {
@@ -95,18 +102,40 @@ export default function ShoppingPage() {
             </MDBInputGroup>
           </div>
 
-          <div style={{ textAlign: 'center' }}>
-            <Link to="/shopping-cart" className="text-reset" style={{ textDecoration: 'none' }}>
-              <MDBIcon
-                  fas
-                  icon="shopping-cart"
-                  size="2x"
-                  style={{ color: '#0d47a1' }}
-              />
-              <div style={{ fontSize: '16px', color: '#0d47a1', marginTop: '5px', fontWeight: 'bold' }}>
-                Cart
-              </div>
-            </Link>
+          <div className="d-flex align-items-center gap-3">
+
+            {/* Not logged in */}
+            {!isLoggedIn && (
+                <Link to="/auth">
+                  <MDBBtn color="primary" size="sm">
+                    <MDBIcon fas icon="sign-in-alt" className="me-2" />
+                    Sign In / Register
+                  </MDBBtn>
+                </Link>
+            )}
+
+            {/* Customer */}
+            {isLoggedIn && role === "CUSTOMER" && (
+                <>
+                  <Link to="/customer-dashboard">
+                    <MDBBtn color="primary" size="sm">Dashboard</MDBBtn>
+                  </Link>
+
+                  <Link to="/shopping-cart">
+                    <MDBBtn color="secondary" size="sm">Cart</MDBBtn>
+                  </Link>
+                </>
+            )}
+
+            {/* Vendor */}
+            {isLoggedIn && role === "VENDOR" && (
+                <>
+                  <Link to="/vendor-dashboard">
+                    <MDBBtn color="primary" size="sm">Dashboard</MDBBtn>
+                  </Link>
+                </>
+            )}
+
           </div>
         </MDBContainer>
       </MDBNavbar>

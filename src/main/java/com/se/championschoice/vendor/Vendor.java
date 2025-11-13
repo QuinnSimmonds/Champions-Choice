@@ -26,6 +26,9 @@ public class Vendor {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    @Transient
+    private String vendorCode;
+
 
     //JPA Constructor
     public Vendor() {
@@ -94,5 +97,8 @@ public class Vendor {
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
+
+    public String getVendorCode() { return vendorCode; }
+
 
 }

@@ -18,7 +18,8 @@ export default function VendorRegister() {
     username: '',
     email: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    vendorCode: ''
   });
 
   const [error, setError] = useState('');
@@ -58,7 +59,8 @@ export default function VendorRegister() {
           businessName: formData.businessName,
           username: formData.username,
           email: formData.email,
-          password: formData.password
+          password: formData.password,
+          vendorCode: formData.vendorCode
         })
       });
 
@@ -159,6 +161,15 @@ export default function VendorRegister() {
               type="password"
               value={formData.confirmPassword}
               onChange={handleChange}
+            />
+
+            <MDBInput
+                wrapperClass="mb-3"
+                label="Vendor Registration Code"
+                id="vendorCode"
+                type="text"
+                value={formData.vendorCode}
+                onChange={handleChange}
             />
 
             {error && (

@@ -8,7 +8,7 @@ import {
 } from 'mdb-react-ui-kit';
 import logo from '../assets/logo.png';
 
-export default function CustomerLogin() {
+export default function CustomerLogin({ setIsLoggedIn }) {
   const navigate = useNavigate();
 
   // state for username/password and errors
@@ -42,10 +42,16 @@ export default function CustomerLogin() {
         const data = await response.json();
         console.log('Login successful:', data);
 
-        // You can store customer info or token in localStorage if needed
-        localStorage.setItem('customer', JSON.stringify(data));
+        // token in localStorage - jwt persistence
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("role", data.role);
+        localStorage.setItem("username", data.username);
+        localStorage.setItem("userId", data.id);
 
-        navigate('/shopping-page'); // redirect after successful login
+        // tell App.js we are logged in
+        setIsLoggedIn(true);
+
+        navigate('/customer-dashboard'); // redirect after successful login
       } else {
         const errData = await response.json();
         setError(errData.message || 'Invalid username or password');

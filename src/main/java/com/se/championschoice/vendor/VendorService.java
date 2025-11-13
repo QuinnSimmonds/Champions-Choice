@@ -4,8 +4,10 @@ import com.se.championschoice.product.ProductRepository;
 import com.se.championschoice.security.JwtUtil;
 import com.se.championschoice.dto.LoginResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class VendorService {
@@ -22,8 +24,19 @@ public class VendorService {
     @Autowired
     private ProductRepository productRepository;
 
+    //Vendor Code
+    private static final String REQ_VENDOR_CODE = "CCVENDOR2025";
+
     //Registration
     public Vendor register(Vendor vendor) {
+        //verify vendor code
+        if (!REQ_VENDOR_CODE.equals(vendor.getVendorCode())) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "Invalid Vendor Registration Code"
+            );
+        }
+
         //check if username already exists
         if (vendorRepository.existsByUsername(vendor.getUsername())) {
             throw new RuntimeException("Username Already Taken");

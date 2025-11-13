@@ -26,22 +26,34 @@ export default function InventoryManager() {
     imageUrl: ""
   });
 
-  const vendor = JSON.parse(localStorage.getItem("vendor"));
+  const vendorId = localStorage.getItem("userId");
+  const token = localStorage.getItem("token");
+  const role = localStorage.getItem("role");
+  const isLoggedIn = !!token;
+
+// redirect non-vendors away
+  useEffect(() => {
+    if (!isLoggedIn || role !== "VENDOR") {
+      window.location.href = "/";
+    }
+  }, [isLoggedIn, role]);
 
   // Fetch vendor products
   const fetchProducts = useCallback(async () => {
     try {
-      const res = await fetch(`/api/products/vendor/${vendor.id}`);
+      const res = await fetch(`/api/products/vendor/${vendorId}`);
       const data = await res.json();
       setProducts(data);
     } catch (err) {
       console.error("Error fetching vendor products:", err);
     }
-  }, [vendor.id]);
+  }, [vendorId]);
 
   useEffect(() => {
-    fetchProducts();
-  }, [fetchProducts]);
+    if (vendorId) {
+      fetchProducts();
+    }
+  }, [fetchProducts, vendorId]);
 
   // Handle form changes
   const handleChange = (e) => {
@@ -52,7 +64,7 @@ export default function InventoryManager() {
   const addProduct = async () => {
     if (!newProduct.name || !newProduct.price) return;
     try {
-      await fetch(`/api/products/vendor/${vendor.id}`, {
+      await fetch(`/api/products/vendor/${vendorId}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newProduct)
@@ -67,7 +79,7 @@ export default function InventoryManager() {
   // Delete a product
   const deleteProduct = async (id) => {
     try {
-      await fetch(`/api/products/${id}/vendor/${vendor.id}`, { method: "DELETE" });
+      await fetch(`/api/products/${id}/vendor/${vendorId}`, { method: "DELETE" });
       fetchProducts();
     } catch (err) {
       console.error("Error deleting product:", err);
@@ -92,6 +104,13 @@ export default function InventoryManager() {
               <strong>Champion’s Choice</strong>
             </Link>
           </MDBNavbarBrand>
+
+          <div className="d-flex align-items-center gap-3">
+            <Link to="/vendor-dashboard">
+              <MDBBtn color="primary" size="sm">Dashboard</MDBBtn>
+            </Link>
+          </div>
+
         </MDBContainer>
       </MDBNavbar>
       <MDBContainer className="py-5">

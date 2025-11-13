@@ -12,10 +12,19 @@ import {
     MDBNavbar,
     MDBNavbarBrand,
 } from "mdb-react-ui-kit";
-import { Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import logo from "../assets/logo.png";
 
 export default function HomePage() {
+    const navigate = useNavigate();
+
+    // jwt persistence
+    const token = localStorage.getItem("token");
+    const role = localStorage.getItem("role");
+    const userId = localStorage.getItem("userId");
+
+    const isLoggedIn = !!token;
+
     const [featuredProducts, setFeaturedProducts] = useState([]);
     const [loading, setLoading] = useState(false);
 
@@ -57,13 +66,40 @@ export default function HomePage() {
                         </Link>
                     </MDBNavbarBrand>
 
-                    <div>
-                        <Link to="/auth">
-                            <MDBBtn color="primary" size="sm">
-                                <MDBIcon fas icon="sign-in-alt" className="me-2" />
-                                Sign In / Register
-                            </MDBBtn>
-                        </Link>
+                    <div className="d-flex align-items-center gap-3">
+
+                        {/* Not logged in */}
+                        {!isLoggedIn && (
+                            <Link to="/auth">
+                                <MDBBtn color="primary" size="sm">
+                                    <MDBIcon fas icon="sign-in-alt" className="me-2" />
+                                    Sign In / Register
+                                </MDBBtn>
+                            </Link>
+                        )}
+
+                        {/* Customer */}
+                        {isLoggedIn && role === "CUSTOMER" && (
+                            <>
+                                <Link to="/customer-dashboard">
+                                    <MDBBtn color="primary" size="sm">Dashboard</MDBBtn>
+                                </Link>
+
+                                <Link to="/shopping-cart">
+                                    <MDBBtn color="secondary" size="sm">Cart</MDBBtn>
+                                </Link>
+                            </>
+                        )}
+
+                        {/* Vendor */}
+                        {isLoggedIn && role === "VENDOR" && (
+                            <>
+                                <Link to="/vendor-dashboard">
+                                    <MDBBtn color="primary" size="sm">Dashboard</MDBBtn>
+                                </Link>
+                            </>
+                        )}
+
                     </div>
                 </MDBContainer>
             </MDBNavbar>
