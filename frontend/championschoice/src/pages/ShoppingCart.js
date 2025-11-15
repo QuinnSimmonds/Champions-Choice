@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { MDBNavbar, MDBNavbarBrand } from "mdb-react-ui-kit";
 import {
   MDBContainer,
@@ -15,19 +15,27 @@ import logo from "../assets/logo.png";
 
 export default function ShoppingCart() {
   const [cart, setCart] = useState([]);
-  const customer = JSON.parse(localStorage.getItem("customer"));
+  const navigate = useNavigate();
+
+  // jwt persistence
+  const token = localStorage.getItem("token");
+  const role = localStorage.getItem("role");
+  const userId = localStorage.getItem("userId");
+
+  const isLoggedIn = !!token;
+  const isCustomer = role === "CUSTOMER";
 
   // Fetch cart items
   const fetchCart = useCallback(async () => {
-    if (!customer) return;
+    if (!isCustomer || !userId) return;
     try {
-      const res = await fetch(`/api/cart/${customer.id}`);
+      const res = await fetch(`/api/cart/${userId}`);
       const data = await res.json();
       setCart(data);
     } catch (err) {
       console.error("Error loading cart:", err);
     }
-  }, [customer]);
+  }, [isCustomer, userId]);
 
   useEffect(() => {
     fetchCart();
@@ -35,7 +43,7 @@ export default function ShoppingCart() {
 
   // Update item quantity
   const updateQuantity = async (itemId, quantity) => {
-    await fetch(`/api/cart/${itemId}?quantity=${quantity}&customerId=${customer.id}`, {
+    await fetch(`/api/cart/${itemId}?quantity=${quantity}&customerId=${userId}`, {
       method: "PUT"
     });
     fetchCart();
@@ -43,13 +51,13 @@ export default function ShoppingCart() {
 
   // Remove item
   const removeItem = async (itemId) => {
-    await fetch(`/api/cart/${itemId}?customerId=${customer.id}`, { method: "DELETE" });
+    await fetch(`/api/cart/${itemId}?customerId=${userId}`, { method: "DELETE" });
     fetchCart();
   };
 
   // Clear entire cart
   const clearCart = async () => {
-    await fetch(`/api/cart/clear/${customer.id}`, { method: "DELETE" });
+    await fetch(`/api/cart/clear/${userId}`, { method: "DELETE" });
     fetchCart();
   };
 
@@ -83,6 +91,34 @@ export default function ShoppingCart() {
               <strong>Champion’s Choice</strong>
             </Link>
           </MDBNavbarBrand>
+
+          <div className="d-flex align-items-center gap-3">
+
+            {/* Not logged in */}
+            {!isLoggedIn && (
+                <Link to="/auth">
+                  <MDBBtn color="primary" size="sm">
+                    <MDBIcon fas icon="sign-in-alt" className="me-2" />
+                    Sign In / Register
+                  </MDBBtn>
+                </Link>
+            )}
+
+            {/* Customer */}
+            {isLoggedIn && role === "CUSTOMER" && (
+                <>
+                  <Link to="/customer-dashboard">
+                    <MDBBtn color="primary" size="sm">Dashboard</MDBBtn>
+                  </Link>
+
+                  <Link to="/shopping-cart">
+                    <MDBBtn color="secondary" size="sm">Cart</MDBBtn>
+                  </Link>
+                </>
+            )}
+
+          </div>
+
         </MDBContainer>
       </MDBNavbar>
       <MDBContainer className="py-5">
@@ -133,7 +169,7 @@ export default function ShoppingCart() {
                 Clear Cart
               </MDBBtn>
 
-              <MDBBtn color="success" onClick={handleCheckout}>
+              <MDBBtn color="success" onClick={() => navigate("/checkout")}>
                 Checkout
               </MDBBtn>
             </div>

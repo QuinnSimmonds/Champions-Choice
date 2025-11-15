@@ -1,11 +1,22 @@
 package com.se.championschoice.vendor;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import com.se.championschoice.product.ProductRepository;
+import com.se.championschoice.security.JwtUtil;
+import com.se.championschoice.dto.LoginResponse;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class VendorService {
+
+    @Autowired
+    private JwtUtil jwtUtil;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
     private VendorRepository vendorRepository;
@@ -13,8 +24,19 @@ public class VendorService {
     @Autowired
     private ProductRepository productRepository;
 
+    //Vendor Code
+    public final String REQ_VENDOR_CODE = "CCVENDOR2025";
+
     //Registration
     public Vendor register(Vendor vendor) {
+        //verify vendor code
+        if (!REQ_VENDOR_CODE.equals(vendor.getVendorCode())) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "Invalid Vendor Registration Code"
+            );
+        }
+
         //check if username already exists
         if (vendorRepository.existsByUsername(vendor.getUsername())) {
             throw new RuntimeException("Username Already Taken");
@@ -25,22 +47,39 @@ public class VendorService {
             throw new RuntimeException("Email Already Registered");
         }
 
+	//encode password before saving to database
+	String hashedPassword = passwordEncoder.encode(vendor.getPassword());
+	vendor.setPassword(hashedPassword);
+
         //Save and return
         return vendorRepository.save(vendor);
     }
 
     //Login
-    public Vendor login(String username, String password) {
+    public LoginResponse login(String username, String password) {
         //find vendor by username
         Vendor vendor = vendorRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Vendor Username Not Found"));
 
-        //check password
-        if (!vendor.getPassword().equals(password)) {
+        //check password based on encoding
+        if (!passwordEncoder.matches(password, vendor.getPassword())) {
             throw new RuntimeException("Incorrect Password");
         }
 
-        return vendor;
+        /// generate JWT
+        String token = jwtUtil.generateToken(
+                vendor.getId(),
+                vendor.getEmail(),
+                "VENDOR"
+        );
+
+        return new LoginResponse(
+                vendor.getId(),
+                vendor.getUsername(),
+                vendor.getEmail(),
+                "VENDOR",
+                token
+        );
     }
 
     //Get Vendor by ID

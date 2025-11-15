@@ -1,5 +1,6 @@
 package com.se.championschoice.vendor;
 
+import com.se.championschoice.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
@@ -20,8 +21,19 @@ public class VendorController {
 
     //Login
     @PostMapping("/login")
-    public Vendor login(@RequestBody Vendor loginRequest) {
-        return vendorService.login(loginRequest.getUsername(), loginRequest.getPassword());
+    public LoginResponse login(@RequestBody LoginRequest request) {
+        return vendorService.login(request.getUsername(), request.getPassword());
+    }
+
+    //Apply
+    @PostMapping("/apply")
+    public Map<String, Object> applyForVendor() {
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("approved", true);
+        response.put("vendorCode", vendorService.REQ_VENDOR_CODE);
+
+        return response;
     }
 
     //Get Profile

@@ -8,7 +8,7 @@ import {
 } from 'mdb-react-ui-kit';
 import logo from '../assets/logo.png';
 
-export default function VendorLogin() {
+export default function VendorLogin({ setIsLoggedIn }) {
   const navigate = useNavigate();
 
   // State for form inputs and error
@@ -42,10 +42,16 @@ export default function VendorLogin() {
         const data = await response.json();
         console.log('Vendor login successful:', data);
 
-        // Optionally save vendor info in localStorage
-        localStorage.setItem('vendor', JSON.stringify(data));
+        // token in localStorage - jwt persistence
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("role", data.role);
+        localStorage.setItem("username", data.username);
+        localStorage.setItem("userId", data.id);
 
-        navigate('/inventory-manager'); // redirect on success
+        // tell App.js we are logged in
+        setIsLoggedIn(true);
+
+        navigate('/vendor-dashboard'); // redirect on success
       } else {
         const errData = await response.json();
         setError(errData.message || 'Invalid username or password');
