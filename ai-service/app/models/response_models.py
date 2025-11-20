@@ -1,16 +1,19 @@
 from pydantic import BaseModel
-from typing import List
 
-class SyntheticItem(BaseModel):
-    item_id: int
-    product_name: str
-    brand: str
-    sport: str
-
-
-class RecommendationResponse(BaseModel):
-    user_id: int
-    recommendations: List[SyntheticItem]
-
+class RecommendedSportResponse(BaseModel):
+    """
+    Response model containing the recommended sport category.
+    
+    Spring Boot will use this sport to query its database 
+    for actual products.
+    """
+    recommended_sport: str
+    
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "recommended_sport": "Soccer"
+            }
+        }
 
     

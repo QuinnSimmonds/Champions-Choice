@@ -1,27 +1,21 @@
 from fastapi import APIRouter
-from app.models.request_models import RecommendationRequest
-from app.models.response_models import RecommendationResponse, SyntheticItem
-from app.services.recommender_service import get_recommendations_by_id
+from app.models.request_models import UserPurchaseHistoryRequest
+from app.models.response_models import RecommendedSportResponse
+from app.services.recommender_service import get_recommended_sport_for_user
 
 router = APIRouter(
-    prefix = "/recommend",
-    tags = ["Recommender"]
-
+    prefix="/recommend",
+    tags=["Recommender"]
 )
 
-@router.post("/by-id", response_model=RecommendationResponse)
-def recommend_by_id(request: RecommendationRequest):
 
-    recommendations = get_recommendations_by_id(
-        user_id = request.user_id,
-        top_n = request.top_n
-
-    )
-
-    items = [SyntheticItem(**rec) for rec in recommendations]
+@router.post("/for-user", response_model=RecommendedSportResponse)
+def recommend_for_user(request: UserPurchaseHistoryRequest):
     
-    return RecommendationResponse(
-        user_id = request.user_id,
-        recommendations = items
+    recommended_sport = get_recommended_sport_for_user(
+        purchased_sports=request.purchased_sports
     )
-
+    
+    return RecommendedSportResponse(
+        recommended_sport=recommended_sport
+    )

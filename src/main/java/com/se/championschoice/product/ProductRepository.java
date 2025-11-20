@@ -17,7 +17,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
   List<Product> findByNameContainingIgnoreCase(String name);
 
   // match recommendation by sport
-  List<Product> findTop3BySportIgnoreCase(String sport);
+  List<Product> findBySportIgnoreCase(String sport);
 
   void deleteAllByVendorId(Long vendorId);
 
