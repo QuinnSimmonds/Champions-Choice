@@ -31,9 +31,22 @@ export default function CustomerRegister() {
 
 // password validation helper
   const isValidPassword = (password) => {
-    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/;
-    return regex.test(password);
-  };
+    // Check minimum length
+    if (password.length < 8) return false;
+    
+    // Check for uppercase letter
+    if (!/[A-Z]/.test(password)) return false;
+    
+    // Check for lowercase letter
+    if (!/[a-z]/.test(password)) return false;
+    
+    // Check for number
+    if (!/\d/.test(password)) return false;
+    
+    // Check for special character
+    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) return false;
+    
+    return true;  };
 
   // handle register submit
   const handleSubmit = async (e) => {
@@ -41,7 +54,7 @@ export default function CustomerRegister() {
     setError('');
 
     if (!isValidPassword(formData.password)) {
-      setError('Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, and one number.');
+      setError('Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.');
       return;
     }
 
@@ -51,7 +64,7 @@ export default function CustomerRegister() {
     }
 
     try {
-      // 👇 proxy handles forwarding to http://localhost:8080
+      // proxy handles forwarding to http://localhost:8080
       const response = await fetch(`/api/customer/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -65,6 +78,7 @@ export default function CustomerRegister() {
       });
 
       if (response.ok) {
+        alert('Registration successful! Please check your email to verify your account.');
         navigate('/customer-login'); // redirect on success
       } else {
         const errData = await response.json();

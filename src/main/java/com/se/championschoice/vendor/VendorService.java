@@ -12,93 +12,91 @@ import org.springframework.web.server.ResponseStatusException;
 @Service
 public class VendorService {
 
-    @Autowired
-    private JwtUtil jwtUtil;
+  @Autowired
+  private JwtUtil jwtUtil;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+  @Autowired
+  private PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private VendorRepository vendorRepository;
+  @Autowired
+  private VendorRepository vendorRepository;
 
-    @Autowired
-    private ProductRepository productRepository;
+  @Autowired
+  private ProductRepository productRepository;
 
-    //Vendor Code
-    public final String REQ_VENDOR_CODE = "CCVENDOR2025";
+  // Vendor Code
+  public final String REQ_VENDOR_CODE = "CCVENDOR2025";
 
-    //Registration
-    public Vendor register(Vendor vendor) {
-        //verify vendor code
-        if (!REQ_VENDOR_CODE.equals(vendor.getVendorCode())) {
-            throw new ResponseStatusException(
-                    HttpStatus.FORBIDDEN,
-                    "Invalid Vendor Registration Code"
-            );
-        }
-
-        //check if username already exists
-        if (vendorRepository.existsByUsername(vendor.getUsername())) {
-            throw new RuntimeException("Username Already Taken");
-        }
-
-        //check if email already exists
-        if (vendorRepository.existsByEmail(vendor.getEmail())) {
-            throw new RuntimeException("Email Already Registered");
-        }
-
-	//encode password before saving to database
-	String hashedPassword = passwordEncoder.encode(vendor.getPassword());
-	vendor.setPassword(hashedPassword);
-
-        //Save and return
-        return vendorRepository.save(vendor);
+  // Registration
+  public Vendor register(Vendor vendor) {
+    // verify vendor code
+    if (!REQ_VENDOR_CODE.equals(vendor.getVendorCode())) {
+      throw new ResponseStatusException(
+          HttpStatus.FORBIDDEN,
+          "Invalid Vendor Registration Code");
     }
 
-    //Login
-    public LoginResponse login(String username, String password) {
-        //find vendor by username
-        Vendor vendor = vendorRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Vendor Username Not Found"));
-
-        //check password based on encoding
-        if (!passwordEncoder.matches(password, vendor.getPassword())) {
-            throw new RuntimeException("Incorrect Password");
-        }
-
-        /// generate JWT
-        String token = jwtUtil.generateToken(
-                vendor.getId(),
-                vendor.getEmail(),
-                "VENDOR"
-        );
-
-        return new LoginResponse(
-                vendor.getId(),
-                vendor.getUsername(),
-                vendor.getEmail(),
-                "VENDOR",
-                token
-        );
+    // check if username already exists
+    if (vendorRepository.existsByUsername(vendor.getUsername())) {
+      throw new RuntimeException("Username Already Taken");
     }
 
-    //Get Vendor by ID
-    public Vendor getById(Long id) {
-        return vendorRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Vendor Not Found"));
+    // check if email already exists
+    if (vendorRepository.existsByEmail(vendor.getEmail())) {
+      throw new RuntimeException("Email Already Registered");
     }
 
-    //Delete Vendor by ID
-    public void deleteVendor(Long id) {
-        //check if vendor exists
-        if (!vendorRepository.existsById(id)) {
-            throw new RuntimeException("Vendor Not Found");
-        }
+    // encode password before saving to database
+    String hashedPassword = passwordEncoder.encode(vendor.getPassword());
+    vendor.setPassword(hashedPassword);
 
-        //delete all products
-        productRepository.deleteAllByVendorId(id);
+    // Save and return
+    return vendorRepository.save(vendor);
+  }
 
-        //delete the vendor
-        vendorRepository.deleteById(id);
+  // Login
+  public LoginResponse login(String username, String password) {
+    // find vendor by username
+    Vendor vendor = vendorRepository.findByUsername(username)
+        .orElseThrow(() -> new RuntimeException("Vendor Username Not Found"));
+
+    // check password based on encoding
+    if (!passwordEncoder.matches(password, vendor.getPassword())) {
+      throw new RuntimeException("Incorrect Password");
     }
+
+    /// generate JWT
+    String token = jwtUtil.generateToken(
+        vendor.getId(),
+        vendor.getEmail(),
+        "VENDOR");
+
+    return new LoginResponse(
+        vendor.getId(),
+        vendor.getUsername(),
+        vendor.getEmail(),
+        "VENDOR",
+        token,
+        null);
+  }
+
+  // Get Vendor by ID
+  public Vendor getById(Long id) {
+    return vendorRepository.findById(id)
+        .orElseThrow(() -> new RuntimeException("Vendor Not Found"));
+  }
+
+  // Delete Vendor by ID
+  public void deleteVendor(Long id) {
+    // check if vendor exists
+    if (!vendorRepository.existsById(id)) {
+      throw new RuntimeException("Vendor Not Found");
+    }
+
+    // delete all products
+    productRepository.deleteAllByVendorId(id);
+
+    // delete the vendor
+    vendorRepository.deleteById(id);
+  }
 }

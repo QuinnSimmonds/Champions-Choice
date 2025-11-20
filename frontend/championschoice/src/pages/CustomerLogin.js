@@ -47,14 +47,27 @@ export default function CustomerLogin({ setIsLoggedIn }) {
         localStorage.setItem("role", data.role);
         localStorage.setItem("username", data.username);
         localStorage.setItem("userId", data.id);
+        localStorage.setItem("isVerified", data.isVerified);
 
         // tell App.js we are logged in
         setIsLoggedIn(true);
 
         navigate('/customer-dashboard'); // redirect after successful login
       } else {
-        const errData = await response.json();
-        setError(errData.message || 'Invalid username or password');
+        // Handle error response - could be JSON or plain text
+        const errText = await response.text();
+        let errorMessage = 'Invalid username or password';
+        
+        try {
+          // Try parsing as JSON first
+          const errData = JSON.parse(errText);
+          errorMessage = errData.message || errorMessage;
+        } catch {
+          // If not JSON, use the plain text (RuntimeException messages)
+          errorMessage = errText || errorMessage;
+        }
+      
+      setError(errorMessage);
       }
     } catch (err) {
       console.error('Error logging in:', err);

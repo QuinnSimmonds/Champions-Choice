@@ -7,107 +7,161 @@ import java.time.LocalDateTime;
 @Table(name = "Customer")
 public class Customer {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @Column(name = "first_name", nullable = false)
-    private String firstName;
+  @Column(name = "first_name", nullable = false)
+  private String firstName;
 
-    @Column(name = "last_name", nullable = false)
-    private String lastName;
+  @Column(name = "last_name", nullable = false)
+  private String lastName;
 
-    @Column(name = "email", unique = true, nullable = false)
-    private String email;
+  @Column(name = "email", unique = true, nullable = false)
+  private String email;
 
-    @Column(name = "username", unique = true, nullable = false)
-    private String username;
+  @Column(name = "username", unique = true, nullable = false)
+  private String username;
 
-    @Column(name = "password", nullable = false)
-    private String password;
+  @Column(name = "password", nullable = false)
+  private String password;
 
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
+  @Column(name = "created_at")
+  private LocalDateTime createdAt;
 
+  // lockout features
+  @Column(name = "failed_login_attempts")
+  private Integer failedLoginAttempts = 0;
 
-    //JPA Constructor
-    public Customer() {
-    }
+  @Column(name = "lockout_until")
+  private LocalDateTime lockoutUntil;
 
-    //Dev Constructor
-    public Customer(String firstName, String lastName, String email, String username, String password) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.username = username;
-        this.password = password;
-    }
+  // email verification
+  @Column(name = "is_verified")
+  private Boolean isVerified = false;
 
-    //Time Stamp
-    @PrePersist
-    protected void onCreate() {
-        createdAt = LocalDateTime.now();
-    }
+  @Column(name = "verification_token")
+  private String verificationToken;
 
+  @Column(name = "verification_token_expiry")
+  private LocalDateTime verificationTokenExpiry;
 
-    //Getters and Setters
-    public Long getId() {
-        return id;
-    }
+  // JPA Constructor
+  public Customer() {
+  }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+  // Dev Constructor
+  public Customer(String firstName, String lastName, String email, String username, String password) {
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.email = email;
+    this.username = username;
+    this.password = password;
+  }
 
-    public String getFirstName() {
-        return firstName;
-    }
+  // Time Stamp
+  @PrePersist
+  protected void onCreate() {
+    createdAt = LocalDateTime.now();
+  }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
+  // Getters and Setters
+  public Long getId() {
+    return id;
+  }
 
-    public String getLastName() {
-        return lastName;
-    }
+  public void setId(Long id) {
+    this.id = id;
+  }
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
+  public String getFirstName() {
+    return firstName;
+  }
 
-    public String getEmail() {
-        return email;
-    }
+  public void setFirstName(String firstName) {
+    this.firstName = firstName;
+  }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
+  public String getLastName() {
+    return lastName;
+  }
 
-    public String getUsername() {
-        return username;
-    }
+  public void setLastName(String lastName) {
+    this.lastName = lastName;
+  }
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
+  public String getEmail() {
+    return email;
+  }
 
-    public String getPassword() {
-        return password;
-    }
+  public void setEmail(String email) {
+    this.email = email;
+  }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
+  public String getUsername() {
+    return username;
+  }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
+  public void setUsername(String username) {
+    this.username = username;
+  }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
+  public String getPassword() {
+    return password;
+  }
 
+  public void setPassword(String password) {
+    this.password = password;
+  }
+
+  public LocalDateTime getCreatedAt() {
+    return createdAt;
+  }
+
+  public void setCreatedAt(LocalDateTime createdAt) {
+    this.createdAt = createdAt;
+  }
+
+  // lockout features
+  public Integer getFailedLoginAttempts() {
+    return failedLoginAttempts;
+  }
+
+  public void setFailedLoginAttempts(Integer failedLoginAttempts) {
+    this.failedLoginAttempts = failedLoginAttempts;
+  }
+
+  public LocalDateTime getLockoutUntil() {
+    return lockoutUntil;
+  }
+
+  public void setLockoutUntil(LocalDateTime lockoutUntil) {
+    this.lockoutUntil = lockoutUntil;
+  }
+
+  // email verification
+  public Boolean getIsVerified() {
+    return isVerified;
+  }
+
+  public void setIsVerified(Boolean isVerified) {
+    this.isVerified = isVerified;
+  }
+
+  public String getVerificationToken() {
+    return verificationToken;
+  }
+
+  public void setVerificationToken(String verificationToken) {
+    this.verificationToken = verificationToken;
+  }
+
+  public LocalDateTime getVerificationTokenExpiry() {
+    return verificationTokenExpiry;
+  }
+
+  public void setVerificationTokenExpiry(LocalDateTime verificationTokenExpiry) {
+    this.verificationTokenExpiry = verificationTokenExpiry;
+  }
 
 }
-
-
