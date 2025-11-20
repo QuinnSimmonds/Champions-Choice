@@ -47,6 +47,7 @@ export default function CustomerLogin({ setIsLoggedIn }) {
         localStorage.setItem("role", data.role);
         localStorage.setItem("username", data.username);
         localStorage.setItem("userId", data.id);
+        localStorage.setItem("isVerified", data.isVerified);
 
         // tell App.js we are logged in
         setIsLoggedIn(true);

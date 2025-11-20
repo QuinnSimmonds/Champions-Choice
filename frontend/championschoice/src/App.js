@@ -16,6 +16,7 @@ import VendorProfile from "./pages/VendorProfile";
 import CheckoutPage from "./pages/CheckoutPage";
 import OrdersPage from "./pages/OrdersPage";
 import VendorApplication from "./pages/VendorApplication";
+import VerifyEmail from "./pages/VerifyEmail.js"
 
 
 function App() {
@@ -64,6 +65,9 @@ function App() {
             <Route path="/orders" element={<OrdersPage />} />
             <Route path="/checkout" element={<CheckoutPage />} />
             <Route path="/inventory-manager" element={<InventoryManager />} />
+
+            {/*verify email*/}
+            <Route path="/verify" element={<VerifyEmail />} />
 
 
         </Routes>

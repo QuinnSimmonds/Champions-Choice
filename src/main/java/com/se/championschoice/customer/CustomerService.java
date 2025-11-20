@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
+import java.util.*;
 
 @Service
 public class CustomerService {
@@ -23,6 +24,9 @@ public class CustomerService {
 
   @Autowired
   private CartRepository cartRepository;
+
+  @Autowired
+  private EmailService emailService;
 
   private void validatePassword(String password) {
     if (password == null || password.length() < 8) {
@@ -46,6 +50,38 @@ public class CustomerService {
     }
   }
 
+  // verify email
+  public Map<String, String> verifyEmail(String token) {
+    Map<String, String> response = new HashMap<>();
+
+    // Find customer by token
+    Customer customer = customerRepository.findByVerificationToken(token)
+        .orElseThrow(() -> new RuntimeException("Invalid verification token"));
+
+    // Check if token expired
+    if (customer.getVerificationTokenExpiry().isBefore(LocalDateTime.now())) {
+      response.put("message", "Verification link has expired. Please request a new one.");
+      response.put("status", "expired");
+      return response;
+    }
+
+    // Check if already verified
+    if (customer.getIsVerified()) {
+      response.put("message", "Email already verified!");
+      response.put("status", "already_verified");
+      return response;
+    }
+
+    // Mark as verified
+    customer.setIsVerified(true);
+    customer.setVerificationToken(null); // Clear token
+    customerRepository.save(customer);
+
+    response.put("message", "Email verified successfully!");
+    response.put("status", "success");
+    return response;
+  }
+
   // Registration
   public Customer register(Customer customer) {
     // check if username already exists
@@ -65,8 +101,28 @@ public class CustomerService {
     String hashedPassword = passwordEncoder.encode(customer.getPassword());
     customer.setPassword(hashedPassword);
 
+    // Generate verification token
+    String token = "abcdefg";
+    customer.setVerificationToken(token);
+    customer.setVerificationTokenExpiry(LocalDateTime.now().plusHours(24));
+    customer.setIsVerified(false);
+
+    // Save customer
+    Customer savedCustomer = customerRepository.save(customer);
+
+    // Send verification email
+    try {
+      emailService.sendVerificationEmail(
+          savedCustomer.getEmail(),
+          savedCustomer.getFirstName(),
+          token);
+    } catch (Exception e) {
+      // Log error but don't fail registration
+      System.err.println("Failed to send verification email: " + e.getMessage());
+    }
+
     // save and return
-    return customerRepository.save(customer);
+    return savedCustomer;
   }
 
   // Login
@@ -122,7 +178,8 @@ public class CustomerService {
         customer.getUsername(),
         customer.getEmail(),
         "CUSTOMER",
-        token);
+        token,
+        customer.getIsVerified());
 
   }
 

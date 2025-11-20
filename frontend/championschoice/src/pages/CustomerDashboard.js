@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
     MDBNavbar, MDBNavbarBrand, MDBBtn, MDBIcon,
     MDBContainer, MDBTypography, MDBRow, MDBCol, MDBCard, MDBCardBody
@@ -8,6 +8,10 @@ import logo from "../assets/logo.png";
 
 export default function CustomerDashboard() {
     const navigate = useNavigate();
+
+    const [showBanner, setShowBanner] = useState(
+      localStorage.getItem('isVerified') === 'false'
+    );
 
     // login persistence
     const token = localStorage.getItem("token");
@@ -66,6 +70,41 @@ export default function CustomerDashboard() {
                     </p>
                 </MDBContainer>
             </div>
+
+            {/* VERIFICATION BANNER */}
+            {showBanner && (
+              <MDBContainer className="mt-4">
+                <div style={{
+                  backgroundColor: '#fff3cd',
+                  border: '1px solid #ffc107',
+                  borderRadius: '5px',
+                  padding: '15px 20px',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center'
+                }}>
+                  <div>
+                    <strong style={{ color: '#856404' }}>⚠️ Please verify your email</strong>
+                    <p style={{ margin: '5px 0 0 0', color: '#856404' }}>
+                      Check your inbox for a verification link to activate your account.
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setShowBanner(false)}
+                    style={{
+                      background: 'transparent',
+                      border: 'none',
+                      fontSize: '24px',
+                      cursor: 'pointer',
+                      padding: '5px 10px',
+                      color: '#856404'
+                    }}
+                  >
+                    ✕
+                  </button>
+                </div>
+              </MDBContainer>
+            )}
 
             {/* MAIN CONTENT */}
             <MDBContainer className="py-5">

@@ -36,6 +36,16 @@ public class Customer {
   @Column(name = "lockout_until")
   private LocalDateTime lockoutUntil;
 
+  // email verification
+  @Column(name = "is_verified")
+  private Boolean isVerified = false;
+
+  @Column(name = "verification_token")
+  private String verificationToken;
+
+  @Column(name = "verification_token_expiry")
+  private LocalDateTime verificationTokenExpiry;
+
   // JPA Constructor
   public Customer() {
   }
@@ -127,6 +137,31 @@ public class Customer {
 
   public void setLockoutUntil(LocalDateTime lockoutUntil) {
     this.lockoutUntil = lockoutUntil;
+  }
+
+  // email verification
+  public Boolean getIsVerified() {
+    return isVerified;
+  }
+
+  public void setIsVerified(Boolean isVerified) {
+    this.isVerified = isVerified;
+  }
+
+  public String getVerificationToken() {
+    return verificationToken;
+  }
+
+  public void setVerificationToken(String verificationToken) {
+    this.verificationToken = verificationToken;
+  }
+
+  public LocalDateTime getVerificationTokenExpiry() {
+    return verificationTokenExpiry;
+  }
+
+  public void setVerificationTokenExpiry(LocalDateTime verificationTokenExpiry) {
+    this.verificationTokenExpiry = verificationTokenExpiry;
   }
 
 }

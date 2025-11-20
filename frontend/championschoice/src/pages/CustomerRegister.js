@@ -78,6 +78,7 @@ export default function CustomerRegister() {
       });
 
       if (response.ok) {
+        alert('Registration successful! Please check your email to verify your account.');
         navigate('/customer-login'); // redirect on success
       } else {
         const errData = await response.json();
