@@ -20,9 +20,11 @@ import logo from "../assets/logo.png";
 export default function ShoppingPage() {
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
+  const [recommendedProducts, setRecommendedProducts] = useState([]);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
+  const [loadingRecommendations, setLoadingRecommendations] = useState(false);
 
   // FILTER & SORT STATE
   const [selectedSport, setSelectedSport] = useState("");
@@ -39,7 +41,12 @@ export default function ShoppingPage() {
 
   useEffect(() => {
     fetchProducts();
-  }, []);
+    
+    // Fetch recommendations if customer is logged in
+    if (isLoggedIn && isCustomer && userId) {
+      fetchRecommendations();
+    }
+  }, [isLoggedIn, isCustomer, userId]);
 
   useEffect(() => {
     applyFiltersAndSorting();
@@ -59,6 +66,19 @@ export default function ShoppingPage() {
       console.error("Error loading products:", err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchRecommendations = async () => {
+    setLoadingRecommendations(true);
+    try {
+      const res = await fetch(`/api/recommendations/for-customer/${userId}?topN=8`);
+      const data = await res.json();
+      setRecommendedProducts(data.products || []);
+    } catch (err) {
+      console.error("Error loading recommendations:", err);
+    } finally {
+      setLoadingRecommendations(false);
     }
   };
 
@@ -127,7 +147,7 @@ export default function ShoppingPage() {
                   }}
               >
                 <img src={logo} alt="Logo" style={{ width: "50px", marginRight: "10px" }} />
-                <strong>Champion’s Choice</strong>
+                <strong>Champion's Choice</strong>
               </Link>
             </MDBNavbarBrand>
 
@@ -182,6 +202,67 @@ export default function ShoppingPage() {
 
         <MDBContainer className="py-4">
 
+          {/* RECOMMENDED FOR YOU SECTION - Only for logged-in customers */}
+          {isLoggedIn && isCustomer && recommendedProducts.length > 0 && (
+            <div className="mb-5">
+              <div className="text-center mb-4">
+                <MDBTypography tag="h2" className="fw-bold mb-2" style={{ color: "#0d47a1" }}>
+                  <MDBIcon fas icon="heart" className="me-2" style={{ color: "#e91e63" }} />
+                  Recommended for You
+                </MDBTypography>
+                <p className="text-muted">Based on your purchase history</p>
+              </div>
+
+              {loadingRecommendations ? (
+                <p className="text-center text-muted">Loading recommendations...</p>
+              ) : (
+                <MDBRow>
+                  {recommendedProducts.map((product) => (
+                    <MDBCol md="6" lg="4" xl="3" className="mb-4" key={product.id}>
+                      <MDBCard className="h-100 shadow-3" style={{ border: "2px solid #e91e63" }}>
+                        <div style={{ 
+                          position: "absolute", 
+                          top: "10px", 
+                          right: "10px", 
+                          backgroundColor: "#e91e63",
+                          color: "white",
+                          padding: "5px 10px",
+                          borderRadius: "20px",
+                          fontSize: "0.8rem",
+                          fontWeight: "bold"
+                        }}>
+                          For You
+                        </div>
+                        <MDBCardImage 
+                          src={product.imageUrl} 
+                          alt={product.name} 
+                          style={{ height: "220px", objectFit: "cover" }} 
+                        />
+                        <MDBCardBody className="text-center">
+                          <MDBTypography tag="h5" className="fw-bold mb-2">
+                            {product.name}
+                          </MDBTypography>
+                          <p className="text-muted">{product.sport}</p>
+                          <p className="small text-muted">{product.description}</p>
+                          <MDBTypography tag="h6" className="mb-3 fw-bold">
+                            ${product.price}
+                          </MDBTypography>
+                          <MDBBtn color="primary" size="sm" onClick={() => handleAddToCart(product.id)}>
+                            <MDBIcon fas icon="cart-plus" className="me-2" />
+                            Add to Cart
+                          </MDBBtn>
+                        </MDBCardBody>
+                      </MDBCard>
+                    </MDBCol>
+                  ))}
+                </MDBRow>
+              )}
+              
+              {/* Divider */}
+              <hr className="my-5" style={{ border: "2px solid #e91e63" }} />
+            </div>
+          )}
+
           {/* FILTERS + SORT */}
           <MDBCard className="mb-4 p-3 shadow-3">
             <MDBRow className="gy-3">
@@ -222,6 +303,14 @@ export default function ShoppingPage() {
 
             </MDBRow>
           </MDBCard>
+
+          {/* ALL PRODUCTS SECTION */}
+          <div className="text-center mb-4">
+            <MDBTypography tag="h2" className="fw-bold mb-2" style={{ color: "#0d47a1" }}>
+              <MDBIcon fas icon="shopping-bag" className="me-2" />
+              All Products
+            </MDBTypography>
+          </div>
 
           {/* PRODUCT GRID */}
           {loading ? (
